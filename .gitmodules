@@ -1,0 +1,6 @@
+[submodule "vendor/zydis"]
+	path = vendor/zydis
+	url = https://github.com/zyantific/zydis.git
+[submodule "vendor/address"]
+	path = vendor/address
+	url = https://github.com/bibles-org/address
