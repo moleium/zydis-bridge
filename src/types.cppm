@@ -27,4 +27,6 @@ export {
     using enum ZydisMachineMode;
     using enum ZydisStackWidth;
     using enum ZydisFormatterStyle;
+    using enum ZydisOperandType;
+    using enum ZydisRegister;
 }
