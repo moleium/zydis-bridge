@@ -20,6 +20,9 @@ export using ::ZydisMachineMode;
 export using ::ZydisStackWidth;
 export using ::ZydisFormatterStyle;
 
+export using ::ZydisOperandType;
+export using ::ZydisRegister;
+
 export {
     using enum ZydisMachineMode;
     using enum ZydisStackWidth;

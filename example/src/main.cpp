@@ -4,6 +4,7 @@
 #include <print>
 #include <string>
 #include <vector>
+#include <cstring>
 
 #ifdef _WIN32
 #include <windows.h>
