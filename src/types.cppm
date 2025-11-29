@@ -8,6 +8,10 @@ module;
 
 export module zydis:types;
 
+export constexpr auto MACHINE_MODE_LONG_64 = ZYDIS_MACHINE_MODE_LONG_64;
+export constexpr auto STACK_WIDTH_64 = ZYDIS_STACK_WIDTH_64;
+export constexpr auto FORMATTER_STYLE_INTEL = ZYDIS_FORMATTER_STYLE_INTEL;
+
 export using ::ZyanU16;
 export using ::ZyanI64;
 export using ::ZyanU64;
