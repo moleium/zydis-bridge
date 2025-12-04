@@ -10,7 +10,10 @@ if(NOT TARGET address)
     add_subdirectory(vendor/address)
 endif()
 
-add_subdirectory(vendor/zydis)
+if(NOT TARGET Zydis::Zydis)
+    add_subdirectory(vendor/zydis)
+endif()
+
 add_library(${PROJECT_NAME} STATIC)
 
 target_sources(${PROJECT_NAME} PUBLIC FILE_SET CXX_MODULES FILES
