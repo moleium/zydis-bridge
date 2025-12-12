@@ -5,11 +5,12 @@ module;
 #include <string>
 #include <vector>
 
-#include <Zydis/Zydis.h>
-#include <Zydis/Utils.h>
 #include <Zydis/Mnemonic.h>
+#include <Zydis/Utils.h>
+#include <Zydis/Zydis.h>
 
 export module zydis:decoder;
+export import :types;
 export import address;
 
 export {
@@ -26,7 +27,11 @@ export namespace zydis {
     ZydisFormatter formatter{};
     std::array<char, 512> format_buffer{};
 
-    // TODO: add getters for the information from the internal zydis structures
+    struct formatted_token {
+        ZydisTokenType type;
+        std::string text;
+    };
+
     struct instruction {
         ZydisDecodedInstruction decoded{};
         std::array<ZydisDecodedOperand, ZYDIS_MAX_OPERAND_COUNT> operands{};
@@ -41,14 +46,17 @@ export namespace zydis {
                 if (operands[i].type == ZYDIS_OPERAND_TYPE_MEMORY &&
                     operands[i].mem.base == ZYDIS_REGISTER_RIP) {
                     ZyanU64 result_address{};
-                    if (ZYAN_SUCCESS(ZydisCalcAbsoluteAddress(&decoded, &operands[i], runtime_address,
-                                                              &result_address))) {
+                    if (ZYAN_SUCCESS(ZydisCalcAbsoluteAddress(
+                                &decoded, &operands[i], runtime_address, &result_address
+                        ))) {
                         return utils::address{result_address};
                     }
-                } else if (operands[i].type == ZYDIS_OPERAND_TYPE_IMMEDIATE && operands[i].imm.is_relative) {
+                } else if (operands[i].type == ZYDIS_OPERAND_TYPE_IMMEDIATE &&
+                           operands[i].imm.is_relative) {
                     ZyanU64 result_address{};
-                    if (ZYAN_SUCCESS(ZydisCalcAbsoluteAddress(&decoded, &operands[i], runtime_address,
-                                                              &result_address))) {
+                    if (ZYAN_SUCCESS(ZydisCalcAbsoluteAddress(
+                                &decoded, &operands[i], runtime_address, &result_address
+                        ))) {
                         return utils::address{result_address};
                     }
                 }
@@ -61,11 +69,10 @@ export namespace zydis {
         }
     };
 
-    // gets the instruction info without decoding operands, much faster.
     std::optional<ZydisDecodedInstruction> get_instruction_info(std::uint8_t const* const address) {
         ZydisDecodedInstruction decoded{};
         const ZyanStatus status = ZydisDecoderDecodeInstruction(
-            &decoder, nullptr, address, ZYDIS_MAX_INSTRUCTION_LENGTH, &decoded
+                &decoder, nullptr, address, ZYDIS_MAX_INSTRUCTION_LENGTH, &decoded
         );
         if (!ZYAN_SUCCESS(status)) {
             return std::nullopt;
@@ -86,10 +93,42 @@ export namespace zydis {
         return format_buffer.data();
     }
 
+    std::optional<std::vector<formatted_token>> tokenize(
+            const instruction& target_instruction,
+            ZyanU64 runtime_address = ZYDIS_RUNTIME_ADDRESS_NONE
+    ) {
+        static thread_local std::array<ZyanU8, 1024> token_buffer;
+        const ZydisFormatterTokenConst* token = nullptr;
+
+        ZyanStatus status = ZydisFormatterTokenizeInstruction(
+                &formatter, &target_instruction.decoded, target_instruction.operands.data(),
+                target_instruction.operands.size(), token_buffer.data(), token_buffer.size(),
+                runtime_address, &token, nullptr
+        );
+
+        if (!ZYAN_SUCCESS(status)) {
+            return std::nullopt;
+        }
+
+        std::vector<formatted_token> tokens;
+        while (token) {
+            ZydisTokenType type;
+            ZyanConstCharPointer val;
+            ZydisFormatterTokenGetValue(token, &type, &val);
+            tokens.push_back({type, val});
+
+            if (!ZYAN_SUCCESS(ZydisFormatterTokenNext(&token))) {
+                break;
+            }
+        }
+        return tokens;
+    }
+
     std::optional<instruction> disassemble(std::uint8_t const* const address) {
         instruction result{};
         const ZyanStatus status = ZydisDecoderDecodeFull(
-                &decoder, address, ZYDIS_MAX_INSTRUCTION_LENGTH, &result.decoded, result.operands.data()
+                &decoder, address, ZYDIS_MAX_INSTRUCTION_LENGTH, &result.decoded,
+                result.operands.data()
         );
         if (!ZYAN_SUCCESS(status)) {
             return std::nullopt;
@@ -98,10 +137,12 @@ export namespace zydis {
         return result;
     }
 
-    std::optional<std::pair<instruction, std::string>> disassemble_format(std::uint8_t const* const address) {
+    std::optional<std::pair<instruction, std::string>>
+    disassemble_format(std::uint8_t const* const address) {
         instruction result{};
         const ZyanStatus status = ZydisDecoderDecodeFull(
-                &decoder, address, ZYDIS_MAX_INSTRUCTION_LENGTH, &result.decoded, result.operands.data()
+                &decoder, address, ZYDIS_MAX_INSTRUCTION_LENGTH, &result.decoded,
+                result.operands.data()
         );
         if (!ZYAN_SUCCESS(status)) {
             return std::nullopt;

@@ -1,10 +1,10 @@
 module;
 
-#include <Zycore/Types.h>
 #include <Zycore/Status.h>
+#include <Zycore/Types.h>
 #include <Zydis/DecoderTypes.h>
-#include <Zydis/Register.h>
 #include <Zydis/Formatter.h>
+#include <Zydis/Register.h>
 
 export module zydis:types;
 
@@ -26,6 +26,7 @@ export using ::ZydisFormatterStyle;
 
 export using ::ZydisOperandType;
 export using ::ZydisRegister;
+export using ::ZydisTokenType;
 
 export {
     using enum ZydisMachineMode;
