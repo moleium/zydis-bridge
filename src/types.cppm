@@ -29,9 +29,9 @@ export using ::ZydisRegister;
 export using ::ZydisTokenType;
 
 export {
-    using enum ZydisMachineMode;
-    using enum ZydisStackWidth;
-    using enum ZydisFormatterStyle;
-    using enum ZydisOperandType;
-    using enum ZydisRegister;
+  using enum ZydisMachineMode;
+  using enum ZydisStackWidth;
+  using enum ZydisFormatterStyle;
+  using enum ZydisOperandType;
+  using enum ZydisRegister;
 }

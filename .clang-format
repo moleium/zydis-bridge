@@ -17,9 +17,8 @@ AllowShortIfStatementsOnASingleLine: false
 BreakConstructorInitializers: AfterColon
 BreakConstructorInitializersBeforeComma: false
 ColumnLimit: 100
-AlignArrayOfStructures: Left
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
-ContinuationIndentWidth: 8
+ContinuationIndentWidth: 2
 AllowShortEnumsOnASingleLine: false
 IncludeCategories:
   - Regex: '^<.*'
@@ -30,7 +29,7 @@ IncludeCategories:
     Priority: 3
 IncludeIsMainRegex: '([-_](test|unittest))?$'
 IndentCaseLabels: true
-IndentWidth: 4
+IndentWidth: 2
 PointerAlignment: Left
 InsertNewlineAtEOF: true
 MacroBlockBegin: ''
