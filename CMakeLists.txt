@@ -4,10 +4,6 @@ project(zydis-bridge VERSION 0.1 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(NOT TARGET address)
-    add_subdirectory(vendor/address)
-endif()
-
 if(NOT TARGET Zydis::Zydis)
     add_subdirectory(vendor/zydis)
 endif()
@@ -21,5 +17,4 @@ target_sources(${PROJECT_NAME} PUBLIC FILE_SET CXX_MODULES FILES
         src/types.cppm
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Zydis::Zydis address)
-target_link_libraries(${PROJECT_NAME} PUBLIC address)
+target_link_libraries(${PROJECT_NAME} PRIVATE Zydis::Zydis)

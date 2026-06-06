@@ -11,7 +11,6 @@ module;
 
 export module zydis:decoder;
 export import :types;
-export import address;
 
 export {
   using ::ZydisMnemonic;
@@ -40,8 +39,7 @@ export namespace zydis {
       return decoded.attributes & ATTRIB_IS_RELATIVE;
     }
 
-    [[nodiscard]] std::optional<utils::address>
-    get_absolute_address(utils::address runtime_address) const {
+    [[nodiscard]] std::optional<ZyanU64> get_absolute_address(ZyanU64 runtime_address) const {
       for (std::size_t i = 0; i < decoded.operand_count; ++i) {
         if (operands[i].type == ZYDIS_OPERAND_TYPE_MEMORY &&
             operands[i].mem.base == ZYDIS_REGISTER_RIP) {
@@ -49,7 +47,7 @@ export namespace zydis {
           if (ZYAN_SUCCESS(
                 ZydisCalcAbsoluteAddress(&decoded, &operands[i], runtime_address, &result_address)
               )) {
-            return utils::address{result_address};
+            return result_address;
           }
         } else if (operands[i].type == ZYDIS_OPERAND_TYPE_IMMEDIATE &&
                    operands[i].imm.is_relative) {
@@ -57,7 +55,7 @@ export namespace zydis {
           if (ZYAN_SUCCESS(
                 ZydisCalcAbsoluteAddress(&decoded, &operands[i], runtime_address, &result_address)
               )) {
-            return utils::address{result_address};
+            return result_address;
           }
         }
       }
